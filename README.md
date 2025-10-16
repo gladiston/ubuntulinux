@@ -1,4 +1,4 @@
-# INSTALAÇÃO DO DEBIAN E PREPARAÇÃO DO AMBIENTE
+# INSTALAÇÃO DO UBUNTU E PREPARAÇÃO DO AMBIENTE
 Este guia documenta o pós-instalação do Ubuntu/KUbuntu com foco em desenvolvedores, administradores de sistemas e entusiastas Linux. Por que Ubuntu? Porque ele é base de várias distros populares como Linux Mint e Zorin OS, então as instruções tendem a funcionar nelas com pouca ou nenhuma adaptação. O objetivo não é explorar cada detalhe da instalação, e sim padronizar o que fazer depois para ter um ambiente estável e produtivo.  
 Escopo:  
 * Foco: configuração do sistema após a instalação (pacotes, serviços, rede, segurança, dev tools).  
@@ -26,16 +26,28 @@ Para o correto entendimento deste HowTo, usarei alguns padrões:
 
 As vezes, comandos que precisam ser executados no terminal são mesclados com o texto da saída do comando, quando isso acontecer, para que você diferencie, qual que é o comando e qual é a saída de texto dele, os comandos serão precedidos de "$", por exemplo:  
 
-|Os comandos que serão seguidos por textos serão precedidos de "$", exemplo:"|  
-|:--|
-|$ sudo apt update -y|
-|Atingido:1 http://security.debian.org/debian-security trixie-security InRelease|
-|Atingido:2 http://deb.debian.org/debian trixie InRelease|
-|Atingido:3 http://deb.debian.org/debian trixie-updates InRelease|
-|Atingido:4 https://dl.google.com/linux/chrome/deb stable InRelease|
-|Todos os pacotes estão atualizados.|  
+Os comandos que serão seguidos por textos serão precedidos de "$", exemplo:  
+```
+$ sudo apt update -y
+Obter:1 https://dl.google.com/linux/chrome/deb stable InRelease [1.825 B]
+Obter:2 https://dl.google.com/linux/chrome/deb stable/main amd64 Packages [1.210 B]                                           
+Atingido:3 http://archive.ubuntu.com/ubuntu questing InRelease                                             
+Atingido:4 http://security.ubuntu.com/ubuntu questing-security InRelease
+Atingido:5 http://archive.ubuntu.com/ubuntu questing-updates InRelease
+Atingido:6 http://archive.ubuntu.com/ubuntu questing-backports InRelease
+Obter:7 http://archive.ubuntu.com/ubuntu questing/main Translation-pt_BR [349 kB]
+Obter:8 http://archive.ubuntu.com/ubuntu questing/main Translation-pt [161 kB]
+Obter:9 http://archive.ubuntu.com/ubuntu questing/universe Translation-pt [823 kB]
+Obter:10 http://archive.ubuntu.com/ubuntu questing/universe Translation-pt_BR [1.668 kB]
+Obter:11 http://archive.ubuntu.com/ubuntu questing/restricted Translation-pt_BR [584 B]
+Obter:12 http://archive.ubuntu.com/ubuntu questing/restricted Translation-pt [588 B]
+Obter:13 http://archive.ubuntu.com/ubuntu questing/multiverse Translation-pt [7.720 B]
+Obter:14 http://archive.ubuntu.com/ubuntu questing/multiverse Translation-pt_BR [18,3 kB]
+Obtidos 3.031 kB em 4s (848 kB/s)                                              
+Todos os pacotes estão atualizados.         
+Nota: Algumas fontes podem ser modernizadas. Execute 'apt modernize-sources' para fazer isso.
+```
 
-No exemplo acima, apenas a linha #1 é um comando e o restante são textos resultantes do comando.  
 
 ### NOTEBOOKs DA LINHA ACER NITRO
 Se tiver um ACER NITRO ou outro computador similar com “Secure Boot”, siga essas instruções:  
@@ -89,25 +101,62 @@ Salve o arquivo e saida do editor.
 > **IMPORTANTE**: A linha acima pode ser um risco ou não a depender do contexto em que você estiver inserido, se achar apropriado fazer isso na sua estação de trabalho então poderá fazê-lo, mas tenha certeza de que seu computador é um **zé-roela** que não oferece nenhum risco, isto é, não tem chaves de segurança que possam ser roubadas ou arquivos valiosos.  
 
 
-## BLOQUEIO DE TELA AUTOMÁTICO
-O sistema normalmente é ajustado automaticamente para bloquear após 5 minutos de atividade, mas ‘falta de atividade’ é um termo incorreto, o correto seria ‘tempo sem interatividade’, isto é, o tempo que você fica sem ter que interagir com o computador. Às vezes estamos processando algo demorado e temos de esperar ou acompanhar a movimentação de log de status e o computador durante este tempo estará tendo muito trabalho, porém com pouca interatividade, a tela será bloqueada. Então precisamos saber quanto tempo precisamos nas tarefas do dia a dia ou então desligá-la.
-
-### GNOME
-Vá em configurações->Privacidade->Tela de bloqueio:
-![Opção de privacidade e tela de bloqueio](https://github.com/gladiston/fedoralinux/blob/main/gnome_tela_bloqueio01.png)
-
-E então ajuste o tempo:
-![Opção de privacidade e tela de bloqueio](https://github.com/gladiston/fedoralinux/blob/main/gnome_tela_bloqueio02.png)
-
-### KDE
-![tela de bloqueio](kde_tela_bloqueio01.png)
-
-Não importa se é GNOME ou KDE, voce também tem a possibilidade de desligá-lo. 
-
 ## INSTALANDO O GOOGLE CHROME
 O Ubuntu acompanha o navegador Firefox. No entanto, o Google Chrome é muito popular e deveras alguns sites só funcionam bem com o motor dele.   
 [Acesse a página de download dos pacotes do navegador Chrome](https://www.google.com/chrome/?platform=linux) e clique em Fazer o download do Google Chrome. Irá aparecer várias versões para Linux, escolha o pacote .deb de 64 bits para as plataformas Debian e Ubuntu, que serve na realidade para todas as distros derivadas do Debian.  
 Após o Download, dê duplo clique nele e o sistema irá dar inicio a instalação e daí, apenas siga as instruções em tela.  
+
+## APT
+O APT foi atualizado a partir da versão 25.10, e todas as vezes que for usar o comando 'apt' irá lhe surgir a mensagem, veja este exemplo:
+```
+$ sudo apt update -y
+Obter:1 https://dl.google.com/linux/chrome/deb stable InRelease [1.825 B]
+Obter:2 https://dl.google.com/linux/chrome/deb stable/main amd64 Packages [1.210 B]                                           
+Atingido:3 http://archive.ubuntu.com/ubuntu questing InRelease                                             
+Atingido:4 http://security.ubuntu.com/ubuntu questing-security InRelease
+Atingido:5 http://archive.ubuntu.com/ubuntu questing-updates InRelease
+Atingido:6 http://archive.ubuntu.com/ubuntu questing-backports InRelease
+Obter:7 http://archive.ubuntu.com/ubuntu questing/main Translation-pt_BR [349 kB]
+Obter:8 http://archive.ubuntu.com/ubuntu questing/main Translation-pt [161 kB]
+Obter:9 http://archive.ubuntu.com/ubuntu questing/universe Translation-pt [823 kB]
+Obter:10 http://archive.ubuntu.com/ubuntu questing/universe Translation-pt_BR [1.668 kB]
+Obter:11 http://archive.ubuntu.com/ubuntu questing/restricted Translation-pt_BR [584 B]
+Obter:12 http://archive.ubuntu.com/ubuntu questing/restricted Translation-pt [588 B]
+Obter:13 http://archive.ubuntu.com/ubuntu questing/multiverse Translation-pt [7.720 B]
+Obter:14 http://archive.ubuntu.com/ubuntu questing/multiverse Translation-pt_BR [18,3 kB]
+Obtidos 3.031 kB em 4s (848 kB/s)                                              
+Todos os pacotes estão atualizados.         
+Nota: Algumas fontes podem ser modernizadas. Execute 'apt modernize-sources' para fazer isso.
+```
+>**OBSERVE A NOTA**:
+>Nota: Algumas fontes podem ser modernizadas. Execute 'apt modernize-sources' para fazer isso.
+
+**O que significa “modernizar fontes” (modernize sources)**
+O sistema provavelmente encontrou um /etc/apt/source.list ou algum arquivo ali usando o formato mais antigo do apt, ao inves do formato deb822 que é um formato mais estruturado (em estilo de “blocos” com chaves “Types:”, “URIs:”, etc.), que torna os arquivos mais legíveis e flexíveis. 
+No meu caso, esta mensagem só apareceu porque a instalação do Google Chrome insere um arquivo de definição de repositório usando o formato antigo, para resolver é fácil, execute:  
+```
+$ sudo apt modernize-sources
+The following files need modernizing:
+  - /etc/apt/sources.list.d/google-chrome.list
+
+Modernizing will replace .list files with the new .sources format,
+add Signed-By values where they can be determined automatically,
+and save the old files into .list.bak files.
+
+This command supports the 'signed-by' and 'trusted' options. If you
+have specified other options inside [] brackets, please transfer them
+manually to the output files; see sources.list(5) for a mapping.
+
+For a simulation, respond N in the following prompt.
+Reescrever 1 fontes? [S/n] s
+Modernizing /etc/apt/sources.list.d/google-chrome.list...
+- Writing /etc/apt/sources.list.d/google-chrome.sources
+```
+
+Aproveitando o momento, há um arquivo esquecido deixado provavelmente pelo instalador em **/etc/apt/sources.list~**, vamos removê-lo:  
+```
+sudo rm -f /etc/apt/sources.list~
+```
 
 
 ## INCLUINDO O REPOSITÓRIO DO VSCODE
@@ -134,25 +183,64 @@ Atualiza os repositórios e instala o VS Code:
 ```
 sudo apt update
 ```  
+Também precisaremos converter o repositório no formato antigo para o novo:   
+```
+$ sudo apt modernize-sources
+The following files need modernizing:
+  - /etc/apt/sources.list.d/vscode.list
 
+Modernizing will replace .list files with the new .sources format,
+add Signed-By values where they can be determined automatically,
+and save the old files into .list.bak files.
+
+This command supports the 'signed-by' and 'trusted' options. If you
+have specified other options inside [] brackets, please transfer them
+manually to the output files; see sources.list(5) for a mapping.
+
+For a simulation, respond N in the following prompt.
+Reescrever 1 fontes? [S/n] s
+Modernizing /etc/apt/sources.list.d/vscode.list...
+- Writing /etc/apt/sources.list.d/vscode.sources
+```  
 
 ## INCLUINDO O REPOSITÓRIO DA MICROSOFT
 Sim, a Microsoft tem um repositório para distribuições Debian-Like.
 Não vamos instalar nada de lá ainda, vamos apenas incluir seu repositório e por mais paradoxo que seja, há um download e instalação para que tenhamos tal repositório, execute os procedimentos abaixo:  
 
-Baixa o pacote de configuração da Microsoft
+Descubra a versão do seu Ubuntu, execute:
 ```
-wget https://packages.microsoft.com/config/debian/13/packages-microsoft-prod.deb -O /tmp/packages-microsoft-prod.deb
+$ cat /etc/issue
+Ubuntu 25.10 \n \l
 ```
-Instala o pacote, que adiciona automaticamente o repositório oficial:  
-```
-sudo dpkg -i  /tmp/packages-microsoft-prod.deb
-```
-Atualiza os repositórios:  
+No exemplo acima, a versão é 25.04, agora visite a página:  
+[Pagina do repositório da Microsoft](https://packages.microsoft.com/config/ubuntu/)  
+
+Vá na pasta correspondente a sua versão, e baixe o arquivo 'packages-microsoft-prod.deb', depois dê um duplo clique nele para instalá-lo.             
+
+Atualize os repositórios:  
 ```
 sudo apt update
 ```  
-Isso produzirá um arquivo em /etc/apt/sources.list.d/microsoft-prod.list que apontará para o repositório oficial da Microsoft.
+Isso produzirá um arquivo em /etc/apt/sources.list.d/microsoft-prod.list que apontará para o repositório oficial da Microsoft. Mas como usa o formato antigo do 'apt' vamos precisar executar novamente:  
+```
+$ sudo apt modernize-sources
+The following files need modernizing:
+  - /etc/apt/sources.list.d/microsoft-prod.list
+
+Modernizing will replace .list files with the new .sources format,
+add Signed-By values where they can be determined automatically,
+and save the old files into .list.bak files.
+
+This command supports the 'signed-by' and 'trusted' options. If you
+have specified other options inside [] brackets, please transfer them
+manually to the output files; see sources.list(5) for a mapping.
+
+For a simulation, respond N in the following prompt.
+Reescrever 1 fontes? [S/n] s
+Modernizing /etc/apt/sources.list.d/microsoft-prod.list...
+- Writing /etc/apt/sources.list.d/microsoft-prod.sources
+```
+
 Está curioso para saber o que a Microsoft está compartilhando? Então execute:
 ```  
 apt-cache policy | grep packages.microsoft.com
@@ -274,14 +362,14 @@ São instalados poucos formatos, por isso, é recomendável instalar os pacotes 
 sudo apt install -y tar zip unzip p7zip-full p7zip-rar rar unrar lzip lzma xz-utils bzip2 gzip squashfs-tools cabextract
 ```
 
-Pacote|Função / Formato
+|Pacote|Função / Formato|
 |:--|:--|
-tar|Criação e extração de arquivos .tar e .tar.gz
-zip, unzip|Manipulação de arquivos .zip
-p7zip-full|Suporte a arquivos .7z (formato 7-Zip)
-p7zip-rar, rar, unrar|Suporte a arquivos .rar
-lzip, lzma, xz-utils, bzip2, gzip|Compactações livres amplamente usadas em pacotes Linux
-squashfs-tools|Criação e extração de arquivos .squashfs
+|tar|Criação e extração de arquivos .tar e .tar.gz|
+|zip, unzip|Manipulação de arquivos .zip|
+|p7zip-full|Suporte a arquivos .7z (formato 7-Zip)|
+|p7zip-rar, rar, unrar|Suporte a arquivos .rar|
+|lzip, lzma, xz-utils, bzip2, gzip|Compactações livres amplamente usadas em pacotes Linux|
+|squashfs-tools|Criação e extração de arquivos .squashfs|
 
 
 ## INSTALANDO O GERENCIADOR DE FONTES
@@ -301,51 +389,28 @@ sudo apt install -y libncurses-dev ack fontconfig imagemagick git meson sassc
 ```
 
 ## ATIVE O SUPORTE A FLATPAK CENTRAL
-O flatpak não está instalado ou habilitado em nosso sistema, para hablitá-lo, basta rodar o seguinte comando no terminal:
+O flatpak não está instalado ou habilitado em nosso sistema, para hablitá-lo, precisará visitar a página:
+[site flatpak.org](https://flatpak.org/setup/Ubuntu)  
+E seguir as instruções, ou seja, execute:  
+
 ```  
 sudo apt install -y flatpak
 ```  
 Para o ambiente GNOME, instale também:
 ```  
-sudo apt install gnome-software-plugin-flatpak
+sudo apt install -y gnome-software-plugin-flatpak
 ```  
 Para o ambiente KDE, instale também:
 ```  
-sudo apt install plasma-discover-backend-flatpak
+sudo apt install -y plasma-discover-backend-flatpak
 ```
 Os pacotes alternativos para GNOME ou KDE são para maior integração dessas DE's ao flathub.
-
-Caso as instrções acima não funcionem, visite a página com informações atualizadas:   
-[https://flatpak.org/setup/Debian](https://flatpak.org/setup/Debian)  
-O link acima também é possivel ter outros repositórios mais específicos como o Ubuntu.  
-
 
 Depois disso, adicionamos enfim, o repositório:
 ```  
 sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 ```
-Provavelmente aparecerá a seguinte mensagem de texto:  
->Note que os diretórios   
->  
->'/var/lib/flatpak/exports/share'  
->'/home/gsantana/.local/share/flatpak/exports/share'  
->  
-> não estão no caminho de pesquisa definido pela variável de ambiente XDG_DATA_DIRS, portanto, os aplicativos instalados pelo Flatpak podem não aparecer em sua área de trabalho até que a sessão seja reiniciada.  
-
-Essa advertência nos instrui a incluir as pastas citadas na variavel de ambiente XDG_DATA_DIRS. E se executar o comando:  
-```
-echo $XDG_DATA_DIRS
-```
-Não aparecerá saída de texto nenhuma, e realmente parece que tem uma falha a ser corrigida, mas calma lá, acontece que os caminhos indicados só serão vistos depois que você *reiniciar sua sessão* e refazer o login, então faça isso.  
-
-Depois de logar-se, vamos testar novamente:
-```
-echo $XDG_DATA_DIRS
-```
-Agora enxergaremos:
-```
-/home/gsantana/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share
-```
+Depois que você *reiniciar sua sessão* e refazer o login, os repositórios estarão funcionando adequadamente.  
 
 ### IMPORTANTE
 Não é uma boa ideia instalar programas do flathub que são fornecidos pelos desenvolvedores originais em local diferente, por exemplo:  
@@ -472,7 +537,7 @@ Essas opções ativam:
 
 
 ## OBTENHA O KDE COMPLETO (OPCIONAL)  
-O KDE que acompanha o Debian é uma versão leve e personalizada para o Debian(wallpapers, logos, etc...), sem todos os módulos e personalizações idealizados pelo time do KDE, se desejar a versão idealizada pelo time do KDE, execute:
+O KDE que acompanha a distro é uma versão leve e personalizada pela desenvolvedora da distro(wallpapers, logos, etc...), sem todos os módulos e personalizações idealizados pelo time do KDE, se desejar a versão idealizada pelo time do KDE, execute:
 ```  
 sudo apt install -y kde-full
 ```
