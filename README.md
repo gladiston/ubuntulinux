@@ -84,17 +84,17 @@ sudo visudo
 ```
 e então procure por:    
 ```
-root    ALL=(ALL:ALL) ALL  
+%sudo   ALL=(ALL:ALL) ALL
 ```  
-Agora escolha uma dessas opções para colocar na linha abaixo dela:  
+Agora comente a linha acima colocando "#" no inicio dela e escolha uma dessas opções para colocar na linha logo abaixo:  
 ```
-gsantana    ALL=(ALL) NOPASSWD: /bin/mount, /bin/umount, /bin/mkdir, /bin/rm, /bin/cp, /bin/chmod, /bin/chown, /bin/touch, /bin/apt, /sbin/reboot, /sbin/poweroff
-gsantana    ALL=(ALL) NOPASSWD: ALL # precisa de senha para todos, exceto a lista acima  
+%sudo    ALL=(ALL:ALL) NOPASSWD: /bin/mount, /bin/umount, /bin/mkdir, /bin/rm, /bin/cp, /bin/chmod, /bin/chown, /bin/touch, /bin/apt, /sbin/reboot, /sbin/poweroff
+%sudo    ALL=(ALL:ALL) NOPASSWD: ALL # precisa de senha para todos, exceto a lista acima  
 ```
 As linhas acima, liberam o sudo sem senha apenas alguns comandos, os demais precisarão da digitação da senha.
 A outra opção, abaixo, libera qualquer comando sem o uso da senha:
 ```
-gsantana   ALL=(ALL:ALL) NOPASSWD: ALL # libera qualquer comando sem usar senha  
+%sudo   ALL=(ALL:ALL) NOPASSWD: ALL # libera qualquer comando sem usar senha  
 ```
 Salve o arquivo e saida do editor.  
 
