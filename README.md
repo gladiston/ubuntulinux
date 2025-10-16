@@ -1428,7 +1428,7 @@ Então significa que o usuário e/ou senha e/ou dominio estão errados. Para uso
 ## BANCO DE DADOS FIREBIRD
 O FirebirdSQL não é empacotado para Debian, RedHat ou outras distros, isso já aconteceu no passado, mas atualmente o FirebirdSQL inclui seu próprio instalador, mas antes de prosseguir com a instalação dele, vamos instalar a lib 'libtommath' que é uma dependencia, execute:
 ```
-sudo apt install-y libtommath-dev
+sudo apt install -y libtommath-dev
 ```
 Agora vá até a [página oficial do FirebirdSQL](https://firebirdsql.org/downloads) e baixe a ultima versão para Linux:  
 
@@ -1541,22 +1541,8 @@ E observe o resultado:
 No exemplo acima, a nossa porta é **3050**, se for um desktop de desenvolvimento, sugiro que troque por **8050**, isso evita acidentes onde o sujeito esqueceu de mudar o nome de host e aplicou o que não deveria em servidor de produção achando que era desenvolvimento, siga esta dica, não use as mesmas portas que um servidor de produção usaria. Muito bem, agora que sabemos o numero da porta, e neste exemplo, vamos usar tanto a **3050** como também a **8050**, execute:
 
 ```
-sudo firewall-cmd --add-port=3050/tcp
-sudo firewall-cmd --add-port=8050/tcp
-```
-Agora vamos repetir a verificação das portas atualmente liberadas:  
-```  
-sudo firewall-cmd --list-ports
-```
-E observe o resultado:  
-> 22/tcp 80/tcp 443/tcp 3050/tcp 3306/tcp 3389/tcp 5432/tcp 8050/tcp  
-
-Esses comandos aplicam as regras apenas no modo temporário até reiniciar o firewalld ou o sistema. Para que elas fiquem permanentes, execute:  
-```
-sudo firewall-cmd --runtime-to-permanent
-```
-Agora, vamos reiniciar o firewall:  
-```
+sudo firewall-cmd --zone=public --add-port=3050/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=8050/tcp --permanent
 sudo firewall-cmd --reload
 ```
 Agora vamos repetir a verificação das portas atualmente liberadas:  
@@ -1564,9 +1550,9 @@ Agora vamos repetir a verificação das portas atualmente liberadas:
 sudo firewall-cmd --list-ports
 ```
 E observe o resultado:  
-> 22/tcp 80/tcp 443/tcp 3050/tcp 3306/tcp 3389/tcp 5432/tcp 8050/tcp
+> 22/tcp 80/tcp 443/tcp **3050/tcp** 3306/tcp 3389/tcp 5432/tcp **8050/tcp**    
 
-Como pode observar acima, as regras não sumiram. Então, este procedimento foi concluido com sucesso.   
+Como pode observar acima, este procedimento foi concluido com sucesso.   
 
 
 ### BANCO DE DADOS FIREBIRD - VARIAVEIS DE AMBIENTE
