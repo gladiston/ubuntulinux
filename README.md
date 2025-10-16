@@ -59,12 +59,12 @@ Se tiver um ACER NITRO ou outro computador similar com “Secure Boot”, siga e
 Não há nada muito especial na instalação, o ponto mais critico é mesmo o particionamento. Esta é uma recomendaçao baseada na minha experiência:   
 
 |sistema|Ponto de montagem|rotulo |Tamanho   |   
-|:-----:|:----------------|:------|:--------:|
-|fat32  |/boot/efi        |Nenhum |1GB       |
-|swap   |Nenhum           |Nenhum |mem.atual |
-|ext4   |/boot            |#boot  |1GB       |
-|ext4   |/                |#root  |100GB     |
-|ext4   |/home            |#dados1|max       |  
+|-------|-----------------|:------------:|:------------:|
+|fat32  |/boot/efi        |Nenhum        |1GB           |
+|swap   |Nenhum           |Nenhum        |mempria atual |
+|ext4   |/boot            |#boot         |1GB           |
+|ext4   |/                |#disco1-root  |100GB         |
+|ext4   |/home            |#dados1       |max           |  
 
 Caso prefira usar Btrfs, "/" e "/home" serão uma única partição geral como "/" formado com o tamanho restante que sobrou do particionamento do disco. Subvolumes para "/" e "/home" são recomendados, mas o instalador do Debian não faz isso. Este sistema de arquivos é uma mão na roda para programadores porque usando snaphots é facil recupera qualquer arquivo apagado ou sobreescrito sem recorrer a backups, além disso a compactação é muito eficiente. 
 >**ALERTA:** Partições Btrfs não podem ter mais de 80% ocupados senão a performance cai por causa do Copy-on-Write(CoW).   
