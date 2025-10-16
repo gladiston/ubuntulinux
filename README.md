@@ -852,11 +852,17 @@ Removed '/etc/systemd/system/samba.service'.
 Entao é porque você estava com o controlador de dominio instalado e nem fazia ideia. De qualquer forma, desativamos e poderá prosseguir.
 
 ### Ativando o compartilhamento de arquivos
-Para usar apenas o compartilhamento de arquivos, iniciaremos apenas estes serviços:  
+Caso você precise realmente compartilhar arquivos que estão em seu computador com máquinas Windows, então precisará habilitar alguns serviços, execute:  
 ```  
 sudo systemctl enable smbd nmbd
 sudo systemctl start smbd nmbd
 ```
+Se quer apenas usufruir de arquivos compartilhados em outros computadores, mas não tem interesse os seus arquivos, então desative estes mesmos serviços:  
+```  
+sudo systemctl disable smbd nmbd
+sudo systemctl stop smbd nmbd
+```
+Isso deixará o sistema mais leve.  
 
 
 ## CRONTAB
@@ -948,27 +954,6 @@ set mouse=
 Salve e feche o arquivo (Ctrl+O, Enter, Ctrl+X).  
 Pronto — agora o mouse não interferirá mais ao usar o Vim.
 
-## PERMISSÃO AO JOURNAL
-O journal é o mecanismo de logs do systemd. Ele registra praticamente tudo o que ocorre no sistema — mensagens do kernel, inicialização de serviços, eventos de segurança, entre outros.
-Antigamente, esses registros eram armazenados em simples arquivos texto (como /var/log/syslog), acessíveis a qualquer usuário. Hoje, o journal é um serviço binário centralizado com restrições de acesso.  
-Essa restrição afeta alguns comandos como o 'systemctrl status \[serviço\]', veja este exemplo:  
-```  
-systemctl status systemd-journald
-```
-você poderá ver um aviso como:
-```  
-Warning: some journal files were not opened due to insufficient permissions.
-```
-Para eliminar esse *warning* e permitir acesso completo aos logs, adicione seu usuário atual ao grupo systemd-journal:
-```  
-sudo usermod -aG systemd-journal "$USER"
-```
-Em seguida, atualize sua sessão para que a mudança tenha efeito:  
-```  
-newgrp systemd-journal  # ou faça logout/login
-```
-Essa alteração só concede acesso de leitura aos logs do sistema. Ela é segura e recomendada para administradores que precisam analisar mensagens de serviços sem usar sudo o tempo todo.
-
 ## FIREWALL 
 Um sistema de firewall geralmente não vem instalado por padrão em muitas distribuições voltadas para desktop. Por isso, o primeiro passo é instalá-lo manualmente. Vamos optar pelo Firewalld, pois ele é o padrão no Fedora, RHEL, CentOS e openSUSE, além de ser totalmente compatível com Debian e Ubuntu. Essa escolha garante comandos consistentes e portabilidade entre diferentes ambientes Linux.  
   
@@ -1018,7 +1003,7 @@ Agora vamos repetir a verificação das portas atualmente liberadas:
 sudo firewall-cmd --list-ports
 ```
 E observe o resultado:  
-> 22/tcp 80/tcp 443/tcp 3050/tcp 3306/tcp 3389/tcp 5432/tcp  
+> 22/tcp 80/tcp 443/tcp 3050/tcp 3306/tcp 3389/tcp 5432/tcp   
   
 Isso significa que obtivemos sucesso, no entanto, essas regras são temporarias até reiniciar o firewalld ou o sistema.  
 
@@ -1034,9 +1019,11 @@ sudo firewall-cmd --reload
 ```
 Agora vamos repetir a verificação das portas atualmente liberadas:  
 ```  
-$ sudo firewall-cmd --list-ports
-22/tcp 80/tcp 443/tcp 3050/tcp 3306/tcp 3389/tcp 5432/tcp 
+sudo firewall-cmd --list-ports
 ```
+E observe o resultado:  
+> 22/tcp 80/tcp 443/tcp 3050/tcp 3306/tcp 3389/tcp 5432/tcp  
+
 Como pode observar acima, as regras não sumiram. Então, quando precisar de regras permanentes faça isso.  
 
 ### LIBERANDO PERMANENTEMENTE PORTAS NO FIREWALL POR PERFIL
@@ -1133,7 +1120,7 @@ drwxr-xr-x 1 gsantana gsantana  0 out 10 17:37  Vídeos
 ```  
 Pronto — agora voce tem comandos mais *breves* para as atividades mais costumeiras.  
 
-> 💡 Curiosidade histórica:  
+> **Curiosidade histórica**:  
 > O uso de aliases e comandos curtos vem dos primeiros sistemas Unix, em que as conexões remotas eram muito lentas — cada caractere digitado economizava tempo e largura de banda. Essa cultura de abreviar comandos (como ls, cp, mv, rm) se manteve até hoje, por eficiência e praticidade.
 
 
@@ -1214,28 +1201,27 @@ Muito bacana, hein?
 ## ACESSAR PARTIÇÕES LINUX NO SISTEMA
 Se utiliza uma ou mais partições Linux que não estão automaticamente montadas você pode usar o gerenciador de arquivos do KDE ou GNOME para acessá-la, mas toda vez que fizer isso, provavelmente lhe será pedido uma senha e isso cansa a vida do desenvolvedor. Minha recomendação é deixar essas partições já montadas e disponiveis imediatamente após o boot. Para conseguir isso, vamos a um exemplo:
 ```
-lsblk -f
+lsblk -f|grep -v "loop"
 ```
 E então verá algo parecido com isso:  
 ```
-NAME        FSTYPE FSVER LABEL   UUID                                 FSAVAIL FSUSE% MOUNTPOINTS
-sda                                                                                  
-└─sda1      ext4   1.0   #disco2 b2154643-7b94-42a1-8146-267bb88ba833                
-sdb                                                                                  
-nvme0n1                                                                              
-├─nvme0n1p1 vfat   FAT32         CF05-E144                             943,3M     1% /boot/efi
-├─nvme0n1p2 swap   1             14ef5e32-fbfe-4fbe-a10a-25df502a6039                [SWAP]
-├─nvme0n1p3 ext4   1.0   #boot   c279ec54-2e8c-4534-a9de-eeefdbd285c3  684,7M    19% /boot
-└─nvme0n1p4 btrfs        #disco1 7f257ca3-213c-4423-a0b9-8cac39089205  921,7G     1% /
+NAME        FSTYPE   FSVER LABEL   UUID                                 FSAVAIL FSUSE% MOUNTPOINTS
+sda                                                                                    
+└─sda1      ext4     1.0   #dados2 b2154643-7b94-42a1-8146-267bb88ba833                
+sdb                                                                                    
+nvme0n1                                                                                
+├─nvme0n1p1 vfat     FAT32         5085-7E3D                             944,1M     1% /boot/efi
+├─nvme0n1p2 ext4     1.0           a6b817f4-8427-4d7d-8c12-4d6ec6e6c66d   98,9G     9% /
+└─nvme0n1p3 ext4     1.0   #dados1 c8cb0172-7521-4ba6-83d4-95211530c8bc  774,7G     1% /home
 ```
 Veja que minhas partições tem etiquetas (label), assim fica muito mais fácil de identificá-las para montagem do que se guiar por nomes como: sda1, sda2, etc...   
-Além da partição NVME onde tem meu sistema inteira instalado, há um disco adicional em /dev/sda1, cujo label é 'ti-01-disco2' e o UUID é 'b2154643-7b94-42a1-8146-267bb88ba833'.   
+Além da partição NVME onde tem meu sistema inteira instalado, há um disco adicional em /dev/sda1, cujo label é '#dados2' e o UUID é 'b2154643-7b94-42a1-8146-267bb88ba833'.   
 
 Primeiro, vamos criar uma pasta vazia para montagem:  
 ```
-sudo mkdir -p /mnt/disco2
-sudo chown -R $USER:$USER /mnt/disco2
-sudo chmod -R 2777 /mnt/disco2
+sudo mkdir -p /mnt/dados2
+sudo chown -R $USER:$USER /mnt/dados2
+sudo chmod -R 2777 /mnt/dados2
 ```
 Os comandos acima garantirão pleno acesso ao conteúdo do que for montado. Depois vamos editar o arquivo /etc/fstab:
 ```
@@ -1243,12 +1229,12 @@ sudo nano /etc/fstab
 ```
 E acrescentamos a seguinte linha usando como exemplo a etiqueta(label) do disco:    
 ```
-# Meu disco#2
-LABEL=#disco2  /mnt/disco2  ext4  defaults  0  0
+# Meu disco #dados2
+LABEL=#dados2  /mnt/dados2  ext4  defaults  0  0
 ```
 Usar etiquetas(LABEL) é interessante, mas o nome da etiqueta pode ser trocado a qualquer instante, mas digamos que o disco seja para ser usado como destino de backup e você não deseja que a troca da etiqueta afete seus scripts de backup? Sua solução neste caso é usar UUID, veja este exemplo:  
 ```
-UUID=b2154643-7b94-42a1-8146-267bb88ba833  /mnt/disco2  ext4  rw,user,exec,auto,umask=000  0  0
+UUID=b2154643-7b94-42a1-8146-267bb88ba833  /mnt/dados2  ext4  rw,user,exec,auto,umask=000  0  0
 ```
 Salve o arquivo, saia do editor.  
 Toda vez que modificar o arquivo 'fstab', precisará executar um comando para que o sistema reconheça as mudanças, execute então:
