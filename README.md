@@ -537,7 +537,7 @@ Essas opções ativam:
 
 
 ## OBTENHA O KDE COMPLETO (OPCIONAL)  
-O KDE que acompanha a distro é uma versão leve e personalizada pela desenvolvedora da distro(wallpapers, logos, etc...), sem todos os módulos e personalizações idealizados pelo time do KDE, se desejar a versão idealizada pelo time do KDE, execute:
+O KDE que acompanha a distro é uma versão leve e personalizada pela desenvolvedora da distro(wallpapers, logos, etc...), sem todos os módulos e personalizações idealizados pelo time do KDE que inclui muitos programas que vocÊ talvez nem sonhe em usar, mas enfim, se desejar a versão idealizada pelo time do KDE, execute:
 ```  
 sudo apt install -y kde-full
 ```
@@ -549,11 +549,22 @@ Se estiver usando discos mecanicos, provavelmente sente muita latencia para carr
 ```
 sudo apt install -y preload
 ```
-Quando instalar, ele se ativará sozinho como serviço e nada mais precisa ser feito, mesmo assim é bom conferir:
+Quando instalar, ele se ativará sozinho como serviço e nada precisa de mais nada, mesmo assim é bom conferir:
 ```
-sudo systemctl status preload
+$ sudo systemctl status preload
+● preload.service - LSB: Adaptive readahead daemon
+     Loaded: loaded (/etc/init.d/preload; generated)
+     Active: active (running) since Thu 2025-10-16 16:15:49 -03; 44s ago
+ Invocation: 43dd115e9acd4d12bc9dea6af1aa2f6a
+       Docs: man:systemd-sysv-generator(8)
+    Process: 3634 ExecStart=/etc/init.d/preload start (code=exited, status=0/SUCCESS)
+      Tasks: 1 (limit: 37542)
+     Memory: 3.5M (peak: 3.5M)
+        CPU: 114ms
+     CGroup: /system.slice/preload.service
+             └─3639 /usr/sbin/preload -s /var/lib/preload/preload.state
 ```
-Depois disso, o serviço estiver desativado, então:
+E como podemos observar no exemplo acima, o mesmo está **active** indicando estar ativo, mas caso seu sistema aponte o contrário, execute:  
 ```
 sudo systemctl start preload
 ```
@@ -561,10 +572,13 @@ E para iniciar o serviço durante o boot, execute:
 ```
 sudo systemctl enable preload
 ```
-Se achar que não houve vantagens, poderá desinstalá-lo pela interface KDE ou GNOME.
+Se achar que não houve vantagens, poderá desinstalá-lo pela interface KDE ou GNOME, ou pelo terminal:  
+```
+sudo apt remove -y --purge  preload 
+```
 
 ## INSTALANDO PERFIS DE USO (TUNED)
-O tunned é um programa que permite trocar em tempo real o perfil de desempenho do compuador, por exemplo, posso usar o perfil de desempenho balanceado quando quero navegar na internet e de um momento para outro trocar o perfil de desempenho para 'realtime' quando quero maximimizar a performance. Há outros perfis prontos para usar maquinas virtuais, economia de energia, etc... O programa tem muitos perfís e é altamente recomendado, vamos a instalação:
+O tunned é um programa que permite trocar em tempo real o perfil de desempenho do compuador por outro, posso usar o perfil de desempenho balanceado quando quero navegar na internet e de um momento para outro trocar o perfil de desempenho para 'realtime' quando quero maximimizar a performance. Há outros perfis prontos para usar maquinas virtuais, economia de energia, etc... O programa tem muitos perfís e é altamente recomendado, vamos a instalação:
 ```
 sudo apt install -y tuned
 ```
@@ -676,15 +690,18 @@ Exemplo de uso: estações de áudio profissional (JACK), robótica, processamen
 ## COMPLETANDO O IDIOMA PORTUGUÊS
 O idioma português-brasil não está completamente instalado, para isso execute o programa “system-config-language”, porém ele não está instalado por padrão, execute:
 ```
-sudo apt install locales task-laptop task-portuguese task-portuguese-desktop
+sudo apt install -y locales task-laptop
+sudo apt install -y task-portuguese task-portuguese-desktop
+sudo apt install -y hunspell-pt-br 
 ```
-💡 O pacote locales fornece os idiomas do sistema; os pacotes task-* completam tradução de menus, ajuda e aplicativos do ambiente gráfico.
+O pacote locales fornece os idiomas do sistema; os pacotes task-* completam tradução de menus, ajuda e aplicativos do ambiente gráfico.  
+Feche a sessão do GNOME ou KDE, caso esteja usando-o e refaça o login.  
 
 Se usa KDE, GNOME, XFCE etc., vá em Configurações do sistema>Região e Idioma>Idioma>Português (Brasil):  
 ![Mudando ou atualizando o idioma](debian-regiao-idioma.png)  
 Você pode aproveitar o momento e remover os idiomas desnecessários, mas não remova o inglês, poderemos requerer ele em algum momento, por exemplo, verificação ortográfica de um texto escrito em inglês.  
 
-Depois disso, vá em Configurações do sistema>Região e Idioma>Idioma>Verificação ortográfica e:  
+Depois disso, vá em Configurações do sistema e procure por "Verificação ortográfica" e faça os seguintes ajustes: 
 * Idioma padrão: Português(Brasil)  
 * Ativar detecção automática de idioma: Ligado  
 * Verificação ortográfica automática ativada por padrão: Ligado  
