@@ -78,7 +78,7 @@ O tamanho de swap para uma partição Linux não pode ser inferior a memória at
 
 ## SUDO
 Diferentemente do Debian, no Ubuntu o usuario comum já é membro do "sudo", então ele pode usar o comando "sudo" a vontade.  
-Mas podemos trocar o comportamento do sudo com respeito ao uso de senha toda vez, execute:  
+Mas podemos trocar o comportamento do sudo com respeito ao uso de senha toda vez que usamos ele, execute:  
 ```
 sudo visudo    
 ```
