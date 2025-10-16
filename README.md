@@ -1640,15 +1640,15 @@ Agora vamos conferir o PATH, execute:
 echo $PATH
 ```
 E observe o resultado:  
->/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:**/opt/firebird/bin**
+>/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:**/opt/firebird/bin**
 
-Se '/opt/firebird/bin' apareceu então este tópico foi concluido com sucesso.
+Se **/opt/firebird/bin** apareceu então este tópico foi concluido com sucesso.
 
 
 ## HABILITANDO AREA DE TRABALHO REMOTA
 Vez ou outra precisaremos acessar nossa area de trabalho, as mais experientes recomendarão usar o 'ssh -x' ou usar 'xserver' e logar-se no ip de nosso desktop, no entanto, isso não é tão simples para novos usuários do linux e também não permite o acesso onde a origem é um desktop Windows. Portanto, minha recomendação é instalar o xrdp, um protocolo de compartilhamento de sessões compativel com o 'rdp' da Microsoft e assim poderemos acessar nosso terminal Linux até mesmo de um Windows através do programa 'Remote Deskop'. Para instalar:  
 ```  
-sudo apt install -y xrdp remmina
+sudo apt install -y xrdp 
 ```
 Verifique se o grupo 'ssl-cert' existe, execute:
 ```  
@@ -1660,7 +1660,7 @@ ssl-cert:x:105:
 ```
 Se a resposta for afirmativa como acima, então agora verifique se o usuário 'xrdp' também exista. execute:
 ```  
-$ getent passwd xrdp  
+getent passwd xrdp  
 ```
 E observe o resultado indicando a existencia:  
 ```
@@ -1673,7 +1673,7 @@ sudo usermod -aG ssl-cert xrdp
 ```
 Agora precisaremos atualizar as permissões imediatamente, execute:
 ```
-sudo systemctl restart xrdp
+sudo systemctl daemon-reload
 ```
 Ou, se preferir, reinicie o sistema (o login de grupo é aplicado na próxima sessão).  
 Agora o serviço xrdp pode acessar os certificados em /etc/ssl/private/, permitindo conexões seguras via TLS sem erros.  
@@ -1710,7 +1710,8 @@ certificate=/etc/ssl/certs/xrdp.crt
 key_file=/etc/ssl/private/xrdp.key
 ```
 4. Reinicie o serviço XRDP, execute:
-```  
+```
+sudo systemctl daemon-reload
 sudo systemctl restart xrdp
 sudo systemctl status xrdp
 ```
@@ -1731,12 +1732,12 @@ O Linux é capaz de criar máquinas virtuais e ele mesmo ser o hypervisor. Será
 ```
 sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils dnsmasq-base ovmf
 ```
-Pacote|Explicação
+|Pacote|Explicação|
 |:--|:--|
-libvirt-daemon-system|Configura o daemon libvirtd para gerenciar VMs via KVM.  
-libvirt-clients|Ferramentas CLI (virsh, virt-install, etc.).  
-dnsmasq-bas|Fornece DHCP/NAT automáticos para redes virtuais.  
-ovmf|Permite boot UEFI em VMs (necessário para Windows/modernos).  
+|libvirt-daemon-system|Configura o daemon libvirtd para gerenciar VMs via KVM.|  
+|libvirt-clients|Ferramentas CLI (virsh, virt-install, etc.).|  
+|dnsmasq-bas|Fornece DHCP/NAT automáticos para redes virtuais.|  
+|ovmf|Permite boot UEFI em VMs (necessário para Windows/modernos).|  
 
 ### Permitir uso sem root
 Adicione seu usuário ao grupo libvirt (e kvm):
@@ -1763,10 +1764,10 @@ lsmod | grep kvm
 ```
 Uma saída aceitável seria:  
 ```
-kvm_amd               217088  0
-kvm                  1396736  1 kvm_amd
-irqbypass              12288  1 kvm
-ccp                   163840  1 kvm_amd
+kvm_amd               249856  0
+kvm                  1466368  1 kvm_amd
+irqbypass              16384  1 kvm
+ccp                   159744  1 kvm_amd
 ```
 Se constar na lista o módulo ‘kvm’, então tá tudo certo.
 
@@ -1776,7 +1777,7 @@ Depois do login, verifique se realmente estou nestes grupos:
 groups
 ```  
 Você deve ver:
->**gsantana** (...) **libvirt** **kvm** (...)
+>**gsantana** (...) **libvirt**  (...)
 
 
 ### Programando o início do serviço
