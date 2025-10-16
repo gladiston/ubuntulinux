@@ -165,7 +165,7 @@ Não vamos instalá-lo agora, vamos apenas incluir seu repositório, execute os 
 
 Atualiza a lista de pacotes:
 ```
-sudo apt update
+sudo apt update -y
 ```
 
 Adiciona a chave pública da Microsoft:
@@ -178,12 +178,7 @@ Adiciona o repositório do VS Code:
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | \
   sudo tee /etc/apt/sources.list.d/vscode.list
 ```
-
-Atualiza os repositórios e instala o VS Code:  
-```
-sudo apt update
-```  
-Também precisaremos converter o repositório no formato antigo para o novo:   
+Temos mais um repositório usando o formato do apt antigo que precisaremos modernizar, execute:  
 ```
 $ sudo apt modernize-sources
 The following files need modernizing:
@@ -201,7 +196,9 @@ For a simulation, respond N in the following prompt.
 Reescrever 1 fontes? [S/n] s
 Modernizing /etc/apt/sources.list.d/vscode.list...
 - Writing /etc/apt/sources.list.d/vscode.sources
-```  
+```
+Pronto, mais tarde iremos instalar o vscode.  
+
 
 ## INCLUINDO O REPOSITÓRIO DA MICROSOFT
 Sim, a Microsoft tem um repositório para distribuições Debian-Like.
@@ -276,34 +273,18 @@ E então, observe o resultado:
 ## ATUALIZAÇÃO DE REPOSITÓRIO
 Vamos atualizar o repositório de programas:  
 ```  
-sudo apt -y update
+sudo apt update -y 
 ```  
 
 Agora, vamos atualizar o sistema:  
 ```  
-sudo apt -y upgrade
+sudo apt upgrade -y 
 ```
 E então observe o resultado:  
+>Resumo:                                     
+>  Atualizando: 0, Instalando: 0, Removendo: 0, Não atualizando: 0
 
->Atualizando:  
->  google-chrome-stable  
->  
->Resumo:  
->  Atualizando: 1, Instalando: 0, Removendo: 0, Não atualizando: 0   
->  Tamanho de download: 121 MB  
->  Espaço necessário: 7.168 B / 997 GB disponível    
->    
->Obter:1 https://dl.google.com/linux/chrome/deb stable/main amd64 google-chrome-stable amd64 141.0.7390.65-1 [121 MB]  
->Obtidos 121 MB em 5s (23,1 MB/s)  
->apt-listchanges: Lendo logs de mudanças...  
->(Lendo banco de dados ... 202444 arquivos e diretórios atualmente instalados).  
->Preparando para desempacotar .../google-chrome-stable_141.0.7390.65-1_amd64.deb ...  
->Desempacotando google-chrome-stable (141.0.7390.65-1) sobre (141.0.7390.54-1) ...  
->Configurando google-chrome-stable (141.0.7390.65-1) ...  
->Processando gatilhos para mailcap (3.74) ...  
->Processando gatilhos para man-db (2.13.1-1) ...  
-
-No exemplo acima, apenas o google-chrome requer atualização.
+No meu exemplo, não há atualizações, mas talvez em seu computador seja direferente.  
 
 
 ## INSTALANDO CODECS
@@ -380,7 +361,7 @@ sudo apt install -y  fontconfig fontforge fonttools
 
 
 ## INSTALANDO PROGRAMAS BASICOS PARA COMPILAÇÃO DE FONTES
-Os pacotes a seguir servem para quem pretende compilar algo no ambiente Linux. Se você pretende instalar o driver proprietário da NVIDIA fornecido pela NVIDIA você também precisará deles:
+Os pacotes a seguir servem para quem pretende compilar algo no ambiente Linux. Neste Howto, vamos precisar, então execute:  
 ```
 sudo apt install -y build-essential
 sudo apt install -y dh-make exuberant-ctags dpkg-dev debhelper fakeroot
@@ -392,7 +373,6 @@ sudo apt install -y libncurses-dev ack fontconfig imagemagick git meson sassc
 O flatpak não está instalado ou habilitado em nosso sistema, para hablitá-lo, precisará visitar a página:
 [site flatpak.org](https://flatpak.org/setup/Ubuntu)  
 E seguir as instruções, ou seja, execute:  
-
 ```  
 sudo apt install -y flatpak
 ```  
@@ -537,14 +517,17 @@ Essas opções ativam:
 
 
 ## OBTENHA O KDE COMPLETO (OPCIONAL)  
-O KDE que acompanha a distro é uma versão leve e personalizada pela desenvolvedora da distro(wallpapers, logos, etc...), sem todos os módulos e personalizações idealizados pelo time do KDE que inclui muitos programas que vocÊ talvez nem sonhe em usar, mas enfim, se desejar a versão idealizada pelo time do KDE, execute:
+A versão do KDE que acompanha o Debian (ou outras distros) costuma ser uma edição reduzida e personalizada pelo mantenedor da distribuição, contendo apenas os componentes essenciais e alguns ajustes visuais, como papéis de parede, ícones e logotipos próprios. Por isso, muitos módulos e aplicativos originais do projeto KDE não vêm instalados por padrão.   
+A versão completa inclui uma grande variedade de ferramentas — de jogos simples (como Paciência) a programas educativos e utilitários diversos. Embora boa parte deles seja dispensável para programadores e administradores de sistema, ela oferece uma experiência mais rica e próxima do que o time do KDE idealizou, lembrando em alguns aspectos o conforto visual do Windows.
+
+Se você deseja instalar o ambiente KDE completo, execute:
 ```  
 sudo apt install -y kde-full
 ```
 Depois disso, *recomendo que reinicie o computador*.
 
 
-## PRELOAD
+## PRELOAD (OPCIONAL)
 Se estiver usando discos mecanicos, provavelmente sente muita latencia para carregar certos progrmas. Numa situação assim, é bom instalar um serviço chamado 'preload', ele monitora os programas que você mais utiliza e durante o boot já os carrega para você. A vantagem é a velocidadade para carregá-los da primeira vez, no entanto, tem o lado negativo, tais programas SEMPRE ESTARÃO NA MEMÓRIA logo após o boot e com isso, o tamanho da sua memória principal após o boot será menor porque esse grupo de programas já estarão na memória. Então a minha recomendação do uso do préload é de apenas usar se (1) usa discos mecânicos e (2) e se tem um fluxo de trabalho consistente e repetitivo com o mesmo grupo de programas. Se depois de avaliar, decidir que o 'preload' é para você, então execute::
 ```
 sudo apt install -y preload
@@ -738,6 +721,14 @@ sudo apt install -y ttf-mscorefonts-installer
 ```
 O pacote instalado acima complementará as fontes Microsoft de que alguns programas portados do Windows talvez precisem.
 
+## INSTALAÇÃO DE FONTE SIMILAR AO "SEGOI"
+O Linux não tem a fonte SegoiUI idealizada pela Microsoft para o sistema Windows. Essa fonte é realmente muito bela para ser usada dentro da UI dos aplicativos, apesar disso, há uma fonte similar que é tão bela quanto a Segoi, vamos instalá-la:  
+```
+sudo apt install -y fonts-inter fonts-noto
+```
+A 'fonts-inter' é bonita e genérica, mas a fonte 'fonts-noto-ui' é bem impressionante para ser usada dentro da UI de aplicativos.  
+
+
 ## INSTALAÇÃO DA FONTE ROBOTO
 A fonte ‘fonts-roboto’ é bastante interessante para uso em terminal e IDEs de programação:
 ```
@@ -826,7 +817,7 @@ WORKGROUP = WORKGROUP
 ```  
 e troque por:  
 ```  
-WORKGROUP = LOCALDOMAIN.LAN
+WORKGROUP = LOCALDOMAIN.LAN # ou apenas LOCALDOMAIN
 ```  
 O nome do dominio (LOCALDOMAIN.LAN, mas use o nome de seu dominio local) deve ser digitado em maiuscula por causa do antigo protocolo WINS ainda em uso no Windows, depois disso salve o arquivo e saia do editor. 
 Com essa modificação, quando acessar uma pasta compartilhada na rede, o nome 'meudominioderedelocal.lan' já aparecerá como padrão na tela de autenticação de usuário e retardará problemas futuros de lesão por esforços repetitivos em seus dedos.  
@@ -854,13 +845,13 @@ Entao é porque você estava com o controlador de dominio instalado e nem fazia 
 ### Ativando o compartilhamento de arquivos
 Caso você precise realmente compartilhar arquivos que estão em seu computador com máquinas Windows, então precisará habilitar alguns serviços, execute:  
 ```  
-sudo systemctl enable smbd nmbd
 sudo systemctl start smbd nmbd
+sudo systemctl enable smbd nmbd
 ```
 Se quer apenas usufruir de arquivos compartilhados em outros computadores, mas não tem interesse os seus arquivos, então desative estes mesmos serviços:  
-```  
-sudo systemctl disable smbd nmbd
+```
 sudo systemctl stop smbd nmbd
+sudo systemctl disable smbd nmbd
 ```
 Isso deixará o sistema mais leve.  
 
@@ -928,7 +919,7 @@ O Vim (Vi IMproved) é um editor de texto poderoso e altamente configurável, ba
 
 Ele oferece atalhos de teclado eficientes, realce de sintaxe, e modos de operação distintos (comando, inserção e visualização), que tornam a edição ágil e precisa. Também pode ser expandido com plugins e temas, transformando-o em um ambiente completo para programação.  
 
-No Debian 13, o Vim não vem instalado por padrão, mas pode ser adicionado facilmente com o apt:  
+Em algumas distros, o Vim não vem instalado por padrão, por isso vamos instalar, caso já esteja instalado, a instalação será ignorada:  
 ```  
 sudo apt install -y vim
 ```  
@@ -955,12 +946,14 @@ Salve e feche o arquivo (Ctrl+O, Enter, Ctrl+X).
 Pronto — agora o mouse não interferirá mais ao usar o Vim.
 
 ## FIREWALL 
-Um sistema de firewall geralmente não vem instalado por padrão em muitas distribuições voltadas para desktop. Por isso, o primeiro passo é instalá-lo manualmente. Vamos optar pelo Firewalld, pois ele é o padrão no Fedora, RHEL, CentOS e openSUSE, além de ser totalmente compatível com Debian e Ubuntu. Essa escolha garante comandos consistentes e portabilidade entre diferentes ambientes Linux.  
+Um sistema de firewall geralmente não vem instalado por padrão em muitas distribuições voltadas para desktop. Isso tem um motivo, o usuário comum terá muitas dificuldades em descobrir porque certas coisas não funcionam como ele quer, e a razão disso pode ser um bloqueio de porta, o exemplo mais típico dentro de empresas são as impressoras de rede, cada modelo como HP, EPSON, XEROX,.. usam portas diferentes para serem encontradas na rede, elas geralmente fazem broadcast para que sistemas operacionais as encontrem e se seu sistema tiver exatamente estas portas bloqueadas, tais impressoras não serão encontradas, por isso, use de cautela se desejar realmente instalar o Firewall, se for iniciante, recomendo que não faça isso.  
+
+Mas se é um desenvolvedor ou administrador de rede e entende os impactos de segurança que um Firewall e concordar com eles, então, o primeiro passo é instalá-lo manualmente. Vamos optar pelo **firewalld**, pois ele é o padrão no Fedora, RHEL, CentOS e openSUSE, além de ser totalmente compatível com Debian e Ubuntu. Interfaces como KDE e GNOME trazem aplicativos visuais para gerenciar e liberar portas. E também, essa escolha garante comandos consistentes e portabilidade entre diferentes ambientes Linux.  
   
 Muitas pessoas argumentam que um firewall é desnecessário em estações de trabalho Linux, e até certo ponto isso é verdade para uso doméstico. Contudo, se você é desenvolvedor ou administrador de sistemas, é essencial que o ambiente de desenvolvimento seja o mais parecido possível com o ambiente de produção — e este quase sempre possui um firewall ativo.  
-Em resumo: instalar o Firewalld no seu ambiente desktop não é apenas por segurança, mas por coerência e preparo profissional.  
+**Em resumo**: instalar o **firewalld** no seu ambiente desktop não é apenas por segurança, mas por coerência e preparo profissional.  
 
-Instale o Firewalld:  
+Instale o **firewalld**:  
 ```
 sudo apt install -y firewalld
 ```
@@ -1036,9 +1029,32 @@ Quando muda de zona, o Firewalld desativa as regras da anterior e aplica as nova
 Por padrão, o Firewalld traz apenas uma zona ativa chamada public, que não possui regras liberadas inicialmente.  
 No entanto, essa zona é herdada por todas as outras, ou seja, qualquer regra adicionada a public se aplicará às demais zonas também.  
   
-Isso é bastante útil — por exemplo, se você quiser liberar a porta 3389 (RDP) para acesso remoto, basta adicioná-la à zona public e ela valerá para todos os perfis.  No exemplo abaixo vamos acrescentar a porta **3389** a zona 'public' de forma permanente:    
+Isso é bastante útil — por exemplo, se você quiser liberar as portas usadas pelo CUPS e certas impressoras de rede, basta adicioná-la à zona public e ela valerá para todos os perfis, execute:    
 ```
-sudo firewall-cmd --zone=public --add-port=3389/tcp --permanent
+# IPP e IPPS (CUPS, impressão e status)
+sudo firewall-cmd --zone=public --add-port=631/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=631/udp --permanent
+sudo firewall-cmd --zone=public --add-port=443/tcp --permanent
+
+# Impressão via Windows/SMB
+sudo firewall-cmd --zone=public --add-port=139/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=445/tcp --permanent
+sudo firewall-cmd --zone=public --add-service=samba-client --permanent
+
+# Impressão LPD/LPR
+sudo firewall-cmd --zone=public --add-port=515/tcp --permanent
+
+# Impressão RAW (JetDirect/AppSocket) – HP, Brother, Canon, Epson
+sudo firewall-cmd --zone=public --add-port=9100-9200/tcp --permanent
+
+# Descoberta de impressoras (Bonjour/mDNS)
+sudo firewall-cmd --zone=public --add-port=5353/udp --permanent
+sudo firewall-cmd --zone=public --add-service=mdns --permanent
+
+# Monitoramento SNMP (opcional, para status de impressoras de rede)
+sudo firewall-cmd --zone=public --add-port=161/udp --permanent
+
+# Recarregando o Firewall:
 sudo firewall-cmd --reload
 ```
 
@@ -1118,7 +1134,9 @@ drwxr-xr-x 1 gsantana gsantana  0 out 10 17:37  Músicas
 drwxr-xr-x 1 gsantana gsantana  0 out 10 17:37  Público
 drwxr-xr-x 1 gsantana gsantana  0 out 10 17:37  Vídeos
 ```  
-Pronto — agora voce tem comandos mais *breves* para as atividades mais costumeiras.  
+Pronto — agora voce tem comandos mais *breves* para as atividades mais costumeiras.    
+Reinicie a sua sessão para os novos aliases entrarem em ação.  
+
 
 > **Curiosidade histórica**:  
 > O uso de aliases e comandos curtos vem dos primeiros sistemas Unix, em que as conexões remotas eram muito lentas — cada caractere digitado economizava tempo e largura de banda. Essa cultura de abreviar comandos (como ls, cp, mv, rm) se manteve até hoje, por eficiência e praticidade.
@@ -1217,7 +1235,13 @@ nvme0n1
 Veja que minhas partições tem etiquetas (label), assim fica muito mais fácil de identificá-las para montagem do que se guiar por nomes como: sda1, sda2, etc...   
 Além da partição NVME onde tem meu sistema inteira instalado, há um disco adicional em /dev/sda1, cujo label é '#dados2' e o UUID é 'b2154643-7b94-42a1-8146-267bb88ba833'.   
 
-Primeiro, vamos criar uma pasta vazia para montagem:  
+Primeiro, vamos relaxar as permissões da pasta **/mnt** e **/media** para que usuários comuns possam criar pastas vazias para montagem:  
+```
+sudo chmod 2777 /mnt
+sudo chmod 2777 /media
+```
+
+Depois, vamos criar uma pasta vazia para montagem:  
 ```
 sudo mkdir -p /mnt/dados2
 sudo chown -R $USER:$USER /mnt/dados2
@@ -1402,6 +1426,7 @@ sudo chmod 600 /etc/cifs-credentials.gsantana.localdomain.lan
 ```
 Agora vamos testar a montagem nas pastas recém criadas:  
 ```
+sudo systemctl daemon-reload
 sudo mount -t cifs //nas01/pub /media/pub -o credentials=/etc/cifs-credentials.gsantana.localdomain.lan,rw,nosuid,nodev,file_mode=0777,dir_mode=0777
 ```
 Funcionou? Espero que sim, mas tome muito cuidado com o arquivo /etc/cifs-credentials.gsantana.localdomain.lan, se houver mensagens como:
