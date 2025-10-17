@@ -2052,7 +2052,9 @@ Depois de instalar os drivers de convidado(virtio) numa VM Windows e reiniciar a
 6. Dentro da VM Windows, crie uma conta com poderes de admin para seu dia a dia, mas não use a conta **Administrador**.  
 7. Dentro da VM Windows, instale um programa de [autologon](https://learn.microsoft.com/pt-br/sysinternals/downloads/autologon).  
 8. Ser for Windows Server, não esqueça de ir em "Language" e mudar o idioma de inglês para o português/brasil, regionalidade, dicionários, etc... e no final, copiar para todos os usuários.  
-9. O padrão de rede da VM é usar **NAT**, se você deseja colocar essa VM como cliente de sua rede, troque de **NAT** por **bridge** e forneça a conexão bridge criada via bridge-utils ou pela interface do KDE. Há vários vídeos no YouTube ensinando como fazer, [recomendo este aqui.](https://youtu.be/jZEN5jFn8rY?si=m9vVPFLATud_DtOE&t=99) ou este [daqui](https://youtu.be/_9zg37IZDsk?si=M66Wad4W21qZ816f)     
+9. O padrão de rede da VM é usar **NAT**, se você deseja colocar essa VM como cliente de sua rede, troque de **NAT** por **bridge** e forneça a conexão bridge criada via bridge-utils ou pela interface do KDE. Há vários vídeos no YouTube ensinando como fazer, [recomendo este aqui.](https://youtu.be/jZEN5jFn8rY?si=m9vVPFLATud_DtOE&t=99) ou este [daqui](https://youtu.be/_9zg37IZDsk?si=M66Wad4W21qZ816f)
+10. Para compartilhar arquivos/pastas entre anfitrião e convidado sem precisar de compartilhar via rede veja este [link aqui](https://www.debugpoint.com/share-folder-virt-manager/) e [este outro aqui](https://www.debugpoint.com/kvm-share-folder-windows-guest/#google_vignette).
+        
 
 ### VIRTUALIZAÇÃO NATIVA QEMU+KVM - Criando máquinas virtuais pelo Virt-Manager
 Instruções de como usar o virt-manager encontra-se na página:  
