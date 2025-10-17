@@ -439,6 +439,8 @@ code --install-extension vscjava.vscode-java-pack \
 É preciso ter a linguagem previamente instalada para prosseguir com as instruções abaixo, isso também inclui o Lazarus, IDE para programação usando freepascal:  
 ```
 sudo apt install -y global exuberant-ctags python3-pygments
+sudo apt install -y libqt5pas-dev
+sudo apt install -y libqt5pas1
 ```
 Depois:  
 ```
