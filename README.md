@@ -1760,7 +1760,7 @@ sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils 
 |Pacote|Explicação|
 |:--|:--|
 |libvirt-daemon-system|Configura o daemon libvirtd para gerenciar VMs via KVM.|  
-|libvirt-clients|Ferramentas CLI (virsh, virt-install, etc.).|  
+|libvirt-clients|Ferramentas CLI (, virt-install, etc.).|  
 |dnsmasq-bas|Fornece DHCP/NAT automáticos para redes virtuais.|  
 |ovmf|Permite boot UEFI em VMs (necessário para Windows modernos).|  
 
@@ -1859,21 +1859,69 @@ out 08 16:26:55 ti-01 systemd[1]: Started libvirtd.service - libvirt legacy mono
 Se retornou 'Active: active' então tá tudo certo.
 
 ### VIRTUALIZAÇÃO NATIVA QEMU+KVM - PASTA PARA ARMAZENAR AS VMs
-Por padrão a localização a localização das máquinas virtuais fica em:
+O sistema trabalha no que chama de 'pools', o conceito é que cada pool tem um nome e aponta para uma pasta ou dispositivo, você pode ter todas as VMs no mesmo lugar, ou criar pools diferentes para cada contexto, vamos ver agora quantos pools temos no sistema, execute:  
 ```
+$ virsh pool-list --all --details
+ Nome      Estado       Auto-iniciar   Persistente   Capacidade   Alocação    Diposnível
+------------------------------------------------------------------------------------------
+ default   executando   sim            sim           114,79 GiB   11,67 GiB   103,12 GiB
+```
+Como poderá observar, há apenas 1 pool, chamado 'default' que tem apenas 103,12 GiB, disponivel. Mas para qual dispositivo ou pasta este pool armazena seus dados? Execute:
+```
+$ virsh pool-dumpxml "default" | grep -oP '(?<=<path>).*(?=</path>)'
 /var/lib/libvirt/images
 ```
-Essa é a localização formal, se estivessemos falando de servidores a partição **/var** seria uma subpartição ou partição separada. Mas em desktops, é muito comum jogarmos /var dentro da partição /(root) que normalmente tem capacidade menor de espaço, e se você seguiu o HowTo até aqui é bem provavel que esteja assim no seu computador também e se isso de fato aconteceu, a localização formal não é o local mais adequado, assim recomendo que suas VMs estejam numa partição com mais espaço, por exemplo, o seu /home/$USER/libvirt, assim execute:  
+Como pode notar, temos o pool **default** que aponta para **/var/lib/libvirt/images**, essa é a localização formal, se estivessemos falando de servidores a partição **/var** seria uma subpartição ou partição separada. Mas em desktops, é muito comum jogarmos /var dentro da partição /(root) que normalmente tem capacidade menor de espaço, e se você seguiu o HowTo até aqui é bem provavel que esteja assim no seu computador também e se isso de fato aconteceu, a localização formal não é o local mais adequado, assim recomendo que suas VMs estejam numa partição com mais espaço, por exemplo, o seu /home/$USER/libvirt, assim execute:  
 ```
 mkdir -p ~/libvirt/images
-chmod 2666 ~/libvirt
+sudo chmod -vR 2775 ~/libvirt
+sudo chown -R libvirt-qemu:kvm ~/libvirt
 ```
-Você pode trocar a localização para qualquer outro local, desde que o grupo **libvirt* tenha acesso a ela, por isso, destacamos uma permissão $2666 (rw-rw-rw) à pasta.  
+Você pode trocar a localização para qualquer outro local, desde que o grupo **libvirt* tenha acesso a ela, por isso, damos permissãoà pasta e subpastas ao libvirt e kvm, execute:  
+```
+sudo chmod -vR 2775 ~/libvirt
+sudo chown -R libvirt-qemu:kvm ~/libvirt
+```
 
-Agora que a pasta foi criada com sucesso, então vamos definir o pool de imagens para lá:  
+Agora que a pasta foi criada com sucesso e tem as permissões corretas, então vamos definir o pool de imagens para lá, primeiro vamos desativar o pool 'default', execute:
 ```
-virsh pool-define-as vm dir - - - - "/home/$USER/libvirt/images"
+sudo virsh pool-destroy default
 ```
+Esse nome "destroy" dá a ideia de apagar, mas não apaga, apenas desativa, uma vez desativado o pool, podemos agora modificá-lo, execute:  
+```
+sudo virsh pool-edit default
+```
+Agora, procure pelo caminho **path** no arquivo XML, algo como:  
+```
+    <path>/var/lib/libvirt/images</path>
+```
+E então troque pelo caminho desejado:
+```
+    <path>/home/gsantana/libvirt/images</path>
+```
+Salve o arquivo e saia do editor.  
+
+Agora, recrie e inicie o pool, execute:  
+```
+sudo virsh pool-build default
+sudo virsh pool-start default
+sudo virsh pool-autostart default
+```
+
+Agora vamos repetir o comando abaixo e conferir se as modificações que implantamos estão corretas:  
+```
+$ virsh pool-list --all --details
+ Nome      Estado       Auto-iniciar   Persistente   Capacidade   Alocação    Diposnível
+------------------------------------------------------------------------------------------
+ default   executando   sim            sim           821,56 GiB   19,33 GiB   802,22 GiB
+```
+Como poderá observar, a alocação agora está mais generosa, parece que realmente não está mais usando o /var, vamos conferir? Execute:
+```
+$ virsh pool-dumpxml "default" | grep -oP '(?<=<path>).*(?=</path>)'
+/home/gsantana/images
+```
+Isso confirma que realmente mudamos o pool 'default' de lugar.  
+
 Pronto, novas VMs serão criadas no diretório acima.  
 
 ### VIRTUALIZAÇÃO NATIVA QEMU+KVM - PASTA PARA ARMAZENAR AS VMs EM BTRFS
