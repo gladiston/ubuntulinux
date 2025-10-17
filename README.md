@@ -1936,8 +1936,16 @@ cd ~/Downloads
 wget -vc https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso
 ```
 
+Se estiver pensando em ambiente de desenvolvimento, a ISO do Windows Server é melhor, tem menor footprint de consumo de memória e CPU, embora não existe uma .iso em português, mesmo instalando em inglês é possivel modificar o idioma. O link para download é:  
+[Site oficial da Microsoft para baixar o Windows Server](https://www.microsoft.com/pt-br/evalcenter/download-windows-server-2025)  
+
+
 Outras instruções e explicações do porque precisamos desses drivers podem ser obtidas aqui:   
 https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md   
+
+No vídeo a seguir, uma explicação sobre máquinas virtuais, incluindo várias dicas:  
+[Produtividade com máquinas virtuais](https://youtu.be/8swg8mDQ9SA?si=HZC7vKnrx7ZxmCfE)  
+
 
 
 ### VIRTUALIZAÇÃO NATIVA QEMU+KVM - Criando máquinas virtuais pelo Virt-Manager
