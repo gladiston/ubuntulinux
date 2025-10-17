@@ -2022,8 +2022,17 @@ Se estiver pensando em ambiente de desenvolvimento, a ISO do Windows Server é m
 [Site oficial da Microsoft para baixar o Windows Server](https://www.microsoft.com/pt-br/evalcenter/download-windows-server-2025)  
 
 
->**ALERTA**: Voce pode usar o virt-manager para criar suas VMs e na tela que você define o tamanho do disco haverá um pseudo-problema, em todas as vezes que crio o disco por esse wizard, os discos virtuais criados serão de tamanho fixo, ou seja, se definir alí que sua VM terá um disco de 200GB, ela terá exatamente 200GB ocupados no sistema operacional. O formato qcow2 aceita usar discos dinamicos, isto é, você cria um disco virtual de 200GB, mas no sistema operacional ele ocupará um tamanho mínimo e crescerá conforme o uso, então como usar discos dinâmicos? Simples, crie primeiro o disco no gerenciador de pools e ele perguntará se deseja um disco de tamanho fixo ou dinâmico e então escolha essa ultima opção e pronto, o arquivo .qcow2 será criado no pool 'default' com tamanho dinâmico. Depois disso, crie sua VM e associe o disco recém-criado com ela.
-
+**ALERTA**: Voce pode usar o virt-manager para criar suas VMs e na tela que você define o tamanho do disco haverá um pseudo-problema, em todas as vezes que crio o disco por esse wizard, os discos virtuais criados serão de tamanho fixo, ou seja, se definir alí que sua VM terá um disco de 200GB, ela terá exatamente 200GB ocupados no sistema operacional. O formato qcow2 aceita usar discos dinamicos, isto é, você cria um disco virtual de 200GB, mas no sistema operacional ele ocupará um tamanho mínimo e crescerá conforme o uso, então como usar discos dinâmicos? Simples, crie primeiro o disco no gerenciador de pools e ele perguntará se deseja um disco de tamanho fixo ou dinâmico e então escolha essa ultima opção e pronto, o arquivo .qcow2 será criado no pool 'default' com tamanho dinâmico. Depois disso, crie sua VM e associe o disco recém-criado com ela. Se houver algum **bug** nisso, poderá também criar o disco virtual pelo terminal, neste exemplo crio um disco de 200GB no pool 'default', veja:  
+```
+sudo virsh vol-create-as default win2k25.qcow2 200G --format qcow2
+```
+Agora vamos conferir o tamanho:  
+```
+$ ls -lh ~/libvirt/images
+total 196K
+-rw------- 1 root kvm 196K Oct 17 14:31 win2k25.qcow2
+```
+Como pôde ver, um disco de 200GB que ocupa apenas 196K no sistema. É claro que a medida que formos instalar o sistema e todas as demais coisas, este arquivo tenderá a subir. Na minha modesta opinião, eu criaria discos apenas pelo terminal porque podemos criar vários em sequencia, evitando o wizard repetitivo para cada um deles.  
 
 Outras instruções e explicações do porque precisamos desses drivers podem ser obtidas aqui:   
 https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md   
