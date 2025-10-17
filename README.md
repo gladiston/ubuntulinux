@@ -2042,17 +2042,17 @@ https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md
 No vídeo a seguir, uma explicação sobre máquinas virtuais, incluindo várias dicas:  
 [Produtividade com máquinas virtuais](https://youtu.be/8swg8mDQ9SA?si=HZC7vKnrx7ZxmCfE)  
 
-**NÃO ESQUEÇA AO CRIAR UM VM WINDOWS**
+**NÃO ESQUEÇA AO CRIAR UM VM WINDOWS**  
 Depois de instalar os drivers de convidado(virtio) numa VM Windows e reiniciar a VM, não esqueça de:  
 1. Na configuração da VM, trocar a Placa de rede (NIC) para **virtio**, isso melhorará o desempenho.  
 2. Na configuração da VM, trocar a placa de vídeo em **Vídeo QXL** para usar o modelo **virtio**, isso melhorará o desempenho.  
 3. Na configuração da VM, na seção **Memória** se você ajustar a memória minima para algo diferente do máximo, o Windows buga, não faça isso.  
-4. Na configuração da VM, na seção **Memória** marque a opção "**Habilitar memória compartilhada** apenas se tiver muitas VMs com o mesmo SO, caso contrário deixe-a desligada.
+4. Na configuração da VM, na seção **Memória** marque a opção "**Habilitar memória compartilhada** apenas se tiver muitas VMs com o mesmo SO, caso contrário deixe-a desligada.  
 5. Na configuração da VM, na seção **Exibição Spide** marque o tipo como **Servidor Spice**, tipo de escula cmo **Endereço** e endereço como **Todas as interfaces** e se achar que precisa de aceleração marque a opção **OpenGL**. O SPICE é um protocolo de acesso remoto, mas com um detalhe importante — ele também é usado localmente pelo virt-manager para exibir a tela da VM, então mesmo que você não esteja acessando “remotamente”, o virt-manager está se conectando via SPICE por baixo dos panos.  
 6. Dentro da VM Windows, crie uma conta com poderes de admin para seu dia a dia, mas não use a conta **Administrador**.  
-7. Dentro da VM Windows, instale um programa de [autologon](https://learn.microsoft.com/pt-br/sysinternals/downloads/autologon).
+7. Dentro da VM Windows, instale um programa de [autologon](https://learn.microsoft.com/pt-br/sysinternals/downloads/autologon).  
 8. Ser for Windows Server, não esqueça de ir em "Language" e mudar o idioma de inglês para o português/brasil, regionalidade, dicionários, etc... e no final, copiar para todos os usuários.  
-9. O padrão de rede da VM é usar **NAT**, se você deseja colocar essa VM como cliente de sua rede, troque de **NAT** por **bridge** e forneça a conexão bridge criada via bridge-utils ou pela interface do KDE. Há vários vídeos no YouTube ensinando como fazer, [recomendo este aqui.](https://youtu.be/_9zg37IZDsk?si=M66Wad4W21qZ816f)  
+9. O padrão de rede da VM é usar **NAT**, se você deseja colocar essa VM como cliente de sua rede, troque de **NAT** por **bridge** e forneça a conexão bridge criada via bridge-utils ou pela interface do KDE. Há vários vídeos no YouTube ensinando como fazer, [recomendo este aqui.](https://youtu.be/_9zg37IZDsk?si=M66Wad4W21qZ816f)    
 
 ### VIRTUALIZAÇÃO NATIVA QEMU+KVM - Criando máquinas virtuais pelo Virt-Manager
 Instruções de como usar o virt-manager encontra-se na página:  
