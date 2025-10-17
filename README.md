@@ -1762,51 +1762,69 @@ sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils 
 |libvirt-daemon-system|Configura o daemon libvirtd para gerenciar VMs via KVM.|  
 |libvirt-clients|Ferramentas CLI (virsh, virt-install, etc.).|  
 |dnsmasq-bas|Fornece DHCP/NAT automáticos para redes virtuais.|  
-|ovmf|Permite boot UEFI em VMs (necessário para Windows/modernos).|  
+|ovmf|Permite boot UEFI em VMs (necessário para Windows modernos).|  
 
 ### Permitir uso sem root
 Adicione seu usuário ao grupo libvirt (e kvm):
+Observe se existe  o grupo 'kvm', ele não é necessário em algumas distros, execute:
+```  
+getent group kvm
+```
+Se ele existir, aparecerá algo como:
+> kvm:x:992:gsantana
+Em algumas distros, o grupo 'kvm' não existe porque não é necessário, a distro cuida disto de forma diferente, então não se aborreça caso o grupo acima não aparecer em seu sistema, prossiga normalmente, mas se ela existir, então incluímos nosso usuário no grupo 'kvm', execute:
 ```  
 sudo usermod -aG kvm $USER
-sudo usermod -aG libvirt $USER
+```
+Depois disso, então repetimos a operação para observar se o grupo 'libvirt' existe:  
 ```  
+getent group libvirt
+```
+É **obrigatório o grupo libvirt existir**, se não existir, algo deu muito errado nos passos anteriores, deverá aparecer algo como:
+> libvirt:x:122:gsantana
+Agora que sabemos que ele existe, então incluímos nosso usuário no grupo 'libvirt', execute:
+```  
+sudo usermod -aG libvirt $USER
+```
+Esses acessos são dados para que o usuário possa ter acesso a arquivos e pastas que apenas o software teria.  
 
-### Para uso em Desktops
+
+### VIRTUALIZAÇÃO NATIVA QEMU+KVM - Para uso em Desktops
 Por tratar-se de um desktop, faça a instalação mais completa:
 ```  
 sudo apt install -y virt-manager virtiofsd
 ```
 
-Pacote|Explicação
+|Pacote|Explicação|
 |:--|:--| 
-virt-manager|Para uso em desktop ou estação de trabalho, o virt-manager é praticamente indispensável.  
-virtiofsd|O pacote virtiofsd fornece o daemon do Virtio-FS, que é o método moderno (e mais rápido) para compartilhar pastas entre host e VMs Linux.  
+|virt-manager|Para uso em desktop ou estação de trabalho, o virt-manager é praticamente indispensável.|  
+|virtiofsd|O pacote virtiofsd fornece o daemon do Virtio-FS, que é o método moderno (e mais rápido) para compartilhar pastas entre host e VMs Linux.|  
 
-3. Conferindo o KVM
+### VIRTUALIZAÇÃO NATIVA QEMU+KVM - CONFERINDO MÓDULOS
 Agora, verifique se os módulos do KVM estão carregados no kernel:
 ```
 lsmod | grep kvm
 ```
 Uma saída aceitável seria:  
 ```
-kvm_amd               249856  0
-kvm                  1466368  1 kvm_amd
-irqbypass              16384  1 kvm
-ccp                   159744  1 kvm_amd
+kvm_amd               217088  0
+kvm                  1396736  1 kvm_amd
+irqbypass              12288  1 kvm
+ccp                   163840  1 kvm_amd
 ```
-Se constar na lista o módulo ‘kvm’, então tá tudo certo.
+Se constar na lista o módulo *kvm* e kvm_amd|kvm_intel, então tá tudo certo.
 
-Depois, *reinicie o computador*.
-Depois do login, verifique se realmente estou nestes grupos:
+Depois, *reinicie o computador*.  
+Depois do login, verifique se realmente estou nestes grupos:  
 ```  
 groups
 ```  
 Você deve ver:
->**gsantana** (...) **libvirt**  (...)
+>**gsantana** adm cdrom sudo dip plugdev lpadmin **libvirt** sambashare(...)
+Isso significa que você tem acesso ao grupo **libvirt** e pode prosseguir.  
 
-
-### Programando o início do serviço
-Se os módulos acima aparecem então agora é o momento de prepará-los para iniciar-se como serviço durante o boot, assim, inicie o serviço do libvirtd com:  
+### VIRTUALIZAÇÃO NATIVA QEMU+KVM - ATIVÁ-LO NO BOOT
+Se os módulos do 'kvm' aparecem então agora é o momento de prepará-los para iniciar-se como serviço durante o boot, assim, inicie o serviço do libvirtd com:  
 ```
 sudo systemctl start libvirtd
 ```
@@ -1840,34 +1858,32 @@ out 08 16:26:55 ti-01 systemd[1]: Started libvirtd.service - libvirt legacy mono
 ```
 Se retornou 'Active: active' então tá tudo certo.
 
-### Localização das VMs
+### VIRTUALIZAÇÃO NATIVA QEMU+KVM - PASTA PARA ARMAZENAR AS VMs
 Por padrão a localização a localização das máquinas virtuais fica em:
 ```
 /var/lib/libvirt/images
 ```
-Pessoalmente, se você tem /var junto a partição /(root), este não é o local mais adequado, assim recomendo que suas VMs estejam numa partição com mais espaço, por exemplo, o seu $HOME em:  
+Essa é a localização formal, se estivessemos falando de servidores a partição **/var** seria uma subpartição ou partição separada. Mas em desktops, é muito comum jogarmos /var dentro da partição /(root) que normalmente tem capacidade menor de espaço, e se você seguiu o HowTo até aqui é bem provavel que esteja assim no seu computador também e se isso de fato aconteceu, a localização formal não é o local mais adequado, assim recomendo que suas VMs estejam numa partição com mais espaço, por exemplo, o seu /home/$USER/libvirt, assim execute:  
 ```
-/home/$USER/libvirt
+mkdir -p ~/libvirt/images
+chmod 2666 ~/libvirt
 ```
-Se estiver usando uma partição Btrfs, isso não se aplica e /var/lib/libvirt/images é um bom local, então ignore este subtópico.
-Mas caso não use Btrfs, vamos mudar a localização original das VMs para nsso $HOME, primeiramente precisaremos incluir um novo poll:  
-```
-mkdir -p /home/$USER/libvirt/images
-```
-Agora que a pasta foi criada com sucesso, então redirecionar o pool de imagens para lá:  
+Você pode trocar a localização para qualquer outro local, desde que o grupo **libvirt* tenha acesso a ela, por isso, destacamos uma permissão $2666 (rw-rw-rw) à pasta. 
+
+Agora que a pasta foi criada com sucesso, então vamos definir o pool de imagens para lá:  
 ```
 virsh pool-define-as vm dir - - - - "/home/$USER/libvirt/images"
 ```
 Pronto, novas VMs serão criadas no diretório acima.
 
-### Localização das VMs numa partição Btrfs
-Se a pasta acima estiver num tipo de partição Btrfs, este tipo de partição faz uma série de operações no disco e algumas delas são anti-performaticas para carregamento de VMs, são elas:
-* CoW: O Copy-on-Write(CoW) é um recurso do Btrfs que (1) quando um arquivo é modificado, ele não é alterado diretamente e (2) o sistema cria uma nova cópia dos blocos modificados e só depois descarta os antigos e isso protege contra corrupção e permite snapshots, mas também significa que cada gravação cria fragmentação e sobrecarga de I/O. Uma coisa interessante é que o CoW pode ser desligado por pastas, então a pasta que armazena as VMs podemos desligar o CoW.
-  Desabilitando CoW:
+### VIRTUALIZAÇÃO NATIVA QEMU+KVM - PASTA PARA ARMAZENAR AS VMs EM BTRFS
+Se a pasta acima é uma partição ext4, ignore este tópico, pule para o próximo.  
+Mas, se a pasta acima estiver num tipo de partição Btrfs, então carece de alguns acertos, por que? Porque este tipo de partição faz uma série de operações no disco e algumas delas são anti-performaticas para carregamento de VMs, são elas:
+* **CoW**: O Copy-on-Write(CoW) é um recurso do Btrfs que (1) quando um arquivo é modificado, ele não é alterado diretamente e (2) o sistema cria uma nova cópia dos blocos modificados e só depois descarta os antigos e isso protege contra corrupção e permite que snapshots instantaneos sejam criados, mas também significa que cada gravação cria fragmentação e sobrecarga de I/O. E agora? Uma coisa interessante é que o CoW pode ser desligado por pastas, então vamos fazer isso à pasta onde as imagens serão armazenadas, mas atenção, a pasta deve estar vazia, agora execute:
 ```
-chattr +C /var/lib/libvirt/images
+chattr +C ~/libvirt
 ```
-* Compressão de dados: No seu tempo ocioso, o Btrfs vai compactar seus arquivos, mas em maquinas virtuais que são arquivos grandes e são modificados a todo instante, não parece ser uma boa ideia e para piorar ainda mais, esse recurso não pode ser desligado por pasta, apenas para [sub]volumes inteiros. A solução é (1) você configurar no virtualizador que crie arquivos seguimentados, ao inves de uma única VM de 50GB, separá-los em vários arquivos menores, por exemplo, a medida que um arquivo enche (exemplo) 2GB, cria um arquivo seguinte e vai repetindo o processo e assim a compressão não irá atrapalhar porque o virtualizador nunca sobreescreve os arquivos seguimentados anteriores. A outra solução, (2) é desabilitando a compressão, e nesse caso, vamos pelo jeito mais simples, quando você for mais experiente, crie volumes separados para VMs para não ter que desligar a compressão para a partição/disco inteiro como faremos agora, edite o arquivo /etc/fstab e procure pela representação do seu disco/partição Btrfs, no meu exemplo, esta assim:
+* **Compressão de dados**: No seu tempo ocioso, o Btrfs vai compactar seus arquivos e ele faz isso de maneira efetiva sem você perceber, não se preocupe, ele não faz isso nos arquivos em uso, mas em maquinas virtuais que são arquivos grandes e são modificados a todo instante, a ideia de compactar não é boa idéia porque gera mais processamento e I/O que rouba recursos que poderiam estar indo para as VMs em uso, então o que fazer? A solução é (1) você configurar no virtualizador que crie arquivos seguimentados, ao inves de uma única VM de tamanho contiguo. Ativando este recurso, o programa irá separá-los em vários arquivos menorescomo continuação da sessão anterior sem nunca sobregravá-los, o lado ruim desse método é que ele vai ocupar muito, mas muito espaço. A outra solução, (2) é desabilitando a compressão na partição onde as VMs estão localizadas, e nesse caso, vamos pelo jeito mais simples, quando você for mais experiente, crie volumes separados para VMs para não ter que desligar a compressão para a partição/disco inteiro como faremos agora, edite o arquivo /etc/fstab e procure pela representação do seu disco/partição Btrfs, no meu exemplo, esta assim:
 ```
 UUID=c045fd1f-7c4f-4ec3-84d9-ec79f8859adf /               btrfs   defaults,subvol=@rootfs 0       0
 ```
@@ -1875,11 +1891,11 @@ Agora, junto com as opções 'default', você acrescenta ',compress=no', ficando
 ```
 UUID=c045fd1f-7c4f-4ec3-84d9-ec79f8859adf /               btrfs   defaults,subvol=@rootfs,compress=no 0       0
 ```
-Salve e feche o editor, então execute:
+Notou o **compress=no** na linha acima? Ela desligará a compressão na partição de montagem, agora *salve* o arquivo e feche o editor, então execute:
 ```
 sudo systemctl daemon-reload
 ```
-Note que agora, a compressão zstd para a unidade inteira esta desligada, significando que todos os arquivos ocuparão mais espaços.
+Note que agora, a *compressão zstd* para a unidade inteira esta desligada, significando que todos os arquivos ocuparão mais espaços.
 Recomendo que reinicie o computador antes de prosseguir.  
 
 Depois de reiniciar o computador, abra o terminal e execute:
@@ -1892,50 +1908,58 @@ GlobalReserve, single: total=35.06MiB, used=0.00B
 ```
 Se não aparecer a palavra “*Compressed*”, significa que nenhum dado comprimido está sendo escrito — a compressão está efetivamente desativada.  
 
-
+**DESFRAGMENTAÇÃO DE PASTA BTRFS**  
 Algo também muito recomendado é a desfragmentação da pasta, pois desligamos algumas propriedades do btrfs e as imagens de VMs costumam ser grandes.   Isso pode ser feito com o comando:  
 ```
 sudo btrfs filesystem defragment -r "/home/$USER/libvirt/images"
 ```
-Se for possivel, use o agendador de tarefsa do Linux para rodá-lo num horário programado, execute o comando 'sudo crontab -e' e adicione a linha:
+Se for possivel, use o agendador de tarefsa do Linux para rodá-lo num horário programado, execute o comando **sudo crontab -e** e adicione a linha:
 ```
-0 12 * * * btrfs filesystem defragment -r  "/home/gsantana/libvirt/images"
+0 12 * * * /bin/bash -c '/usr/bin/btrfs filesystem defragment -r "/home/gsantana/libvirt/images"'
 ```
 O comando acima, no horário 12:00 (almoço) fará a desfragmentação da pasta mencionada.
 
-### Localização das ISOs
-Também precisaremos de um repositório para guardar nossas isos, escolha o diretorio que desejar:  
+### VIRTUALIZAÇÃO NATIVA QEMU+KVM - Localização das ISOs
+Também precisaremos de um repositório para guardar nossas isos - arquivos de instalação de sistemas operacionais - escolha o diretorio que desejar, mas o mais bacana é não ter arquivos .iso dentro de unidades caras e rápidas como ssd, o interessante é armazená-las em discos mecânicos que são mais baratos, mas isso é apenas uma sugestão, caso você use o sistema de virtualização apenas para máquinas Windows e terá poucos isos, talvez não faça diferença onde criar este _pool_ porque apagará estes .iso depois de terminada a instalação e é este exemplo que faço abaixo, execute:  
 ```
-mkdir -p /home/$USER/WinSrv/isos
-virsh pool-define-as isos dir - - - - "/home/$USER/WinSrv/isos"
+virsh pool-define-as isos dir - - - - "/home/$USER/Downloads"
 ```
+>**DICA**: O caminho acima é apenas uma sugestão, no exemplo acima, a pasta de Download será usada para armazenar as isos, subentende-se de que após o uso da .iso e não precise mais, você possa removê-la.
 
-### Virtualização de Windows
-Se pretende virtualizar máquinas windows precisará dessa .iso em seu sistema, eles contêm drivers de sistema convidado:  
+### VIRTUALIZAÇÃO NATIVA QEMU+KVM - Windows
+Se pretende virtualizar máquinas windows precisará dessa .iso em seu sistema, em nosso exemplo, eles contêm drivers de sistema convidado. Em nosso exemplo anterior, o pool de arquivos .iso é a pasta de ~/Downloads, então vamos baixar este .iso lá, execute:  
 ```
-cd /home/$USER/WinSrv/isos
+cd ~/Downloads
 wget -vc https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso
 ```
 
 Outras instruções e explicações do porque precisamos desses drivers podem ser obtidas aqui:
 https://github.com/virtio-win/virtio-win-pkg-scripts/blob/master/README.md
 
-### Criando máquinas virtuais pelo Virt-Manager
+### VIRTUALIZAÇÃO NATIVA QEMU+KVM - Criando máquinas virtuais pelo Virt-Manager
 Instruções de como usar o virt-manager encontra-se na página:
 [Criando máquinas virtuais pelo Virt-Manager](https://sempreupdate.com.br/como-configurar-e-usar-o-virt-manager-para-kvm-no-fedora-ubuntu-debian-e-derivados/#google_vignette)
 
-## VIRTUALIZAÇÃO NATIVA QEMU+KVM JUNTO COM O VIRTUALBOX
-Usar o QEMU+KVM junto ou simultaneamente com o VirtualBox não é possivel, mas é possivel chavear o uso, como assim? É possivel usar o VirtualBox enquanto não usar QEMU+KVM. Funciona assim, quando você dá boot no sistema, um dos modulos do kernel é requisitado pelo QEMU+KVM e este módulo carregado interompe a virtuaização de VMs pelo VirtualBox, então o que precisa fazer é, antes de chamar o virtualbox, descarregar este modulo da memória, execute:  
+### VIRTUALIZAÇÃO NATIVA QEMU+KVM -  QEMU+KVM JUNTO COM O VIRTUALBOX
+No dia a dia você usará QEMU+KVM, no entanto, durante esse período de migração do VirtualBox, talvez seja necessáio usar o VirtualBox algumas vezes e aí vem o problema, não é possível usar o **QEMU+KVM** junto ou simultaneamente com o **VirtualBox**, e agora?  
+É possivel chavear o uso, isto é, é possivel usar o VirtualBox enquanto não usar QEMU+KVM. Funciona assim, quando você dá boot no sistema, um dos modulos do kernel é requisitado pelo QEMU+KVM e este módulo 'kvm_intel' ou 'kvm_amd' é requisitado e impede o VirtualBox de carregar suas VMs, então o que precisa fazer é, antes de chamar o virtualbox, descarregar este modulo da memória, execute:  
 ```
 sudo systemctl stop libvirtd # para o serviço libvirtd
 #sudo systemctl disable libvirtd # desabilitar durante o boot
-sudo modprobe -r kvm kvm_amd 
 ```
-Se for Intel, use kvm_intel em vez de kvm_amd, como fiz acima. Depois, confirme que o módulo saiu:  
+Se for um processador AMD, execute também:
+```
+sudo modprobe -r kvm kvm_amd
+```
+Mas se for um processador Intel, execute:
+```
+sudo modprobe -r kvm kvm_intel
+```
+E então veja se os módulos 'kvm_intel' ou 'kvm_amd' sairam da memória, execute:  
 ```
 lsmod | grep kvm
 ```
-Se irá usar o VirtualBox por um certo tempo é chato ficar executando os comandos acima todas as vezes, então neste caso, edite o arquivo blacklist-kvm.conf, execute:
+Se irá usar o VirtualBox por um certo período de tempo é chato ficar executando os comandos acima todas as vezes, então neste caso, crie/edite o arquivo blacklist-kvm.conf, execute:
 ```
 sudo nano /etc/modprobe.d/blacklist-kvm.conf
 ```
@@ -1951,13 +1975,13 @@ Salve (Ctrl+O, Enter, Ctrl+X) e depois atualize o initramfs:
 ```
 sudo update-initramfs -u
 ```
-Depois poderá reiniciar o sistema com 'sudo reboot' e notará que o VirtualBox funcionará de primeira.
-Se quiser reverter, apenas comente as linhas no arquivo 'blacklist-kvm.conf' e repita 'sudo update-initramfs -u' e a seguir o kvm se ligará novamente ao qemu.  
+Depois poderá reiniciar o sistema com 'sudo reboot' e notará que o VirtualBox finalmente conseguirá carregar suas VMs.  
+Quando precisar reverter, isto é, usar **QEMU+KVM** apenas comente as linhas no arquivo 'blacklist-kvm.conf' e repita 'sudo update-initramfs -u' e depois do boot, estará revertido.  
 
 
 ## VIRTUALBOX
-O VirtualBox é outro virtualizador, ele é do tipo "2" e isto significa que é um pouco inferior em performance ao qemu+kvm, no entanto, ele tem muito mais habilidades para desktop do que o virtualizador nativo, por exemplo, o SEAMLESS que permite puxar um aplicativo Windows dentro da VM para o sistema hospedeiro, causando a impressão que está rodando uma aplicação Linux nativa.  
-No entanto, ele enfrenta alguns bugs chatos desde que os ambientes Linux estão saindo do Xorg para o Wayland(Debian 13). Alguns são problemas grandes, o SEAMLESS não funciona mais, e outros são problemas pequenos aleatórios e irritantes como o conteúdo da área de clipboard entre hospedeiro e convidado deixar de funcionar, cursor do mouse que deixa de funcionar e coisas do tipo, ainda estou enumerando-os. Espero que as versões recentes corrijam isso, é um bom virtualizador e tem uma opção que qemu+kvm não tem: transportar a VM para outros sistemas operacionais, isto é, você pode copiar a VM criado no Linux para rodar num hospedeiro Windows ou Mac OS.  
+O VirtualBox é outro virtualizador, ele é do tipo "2" e isto significa que é um pouco inferior em performance ao qemu+kvm, no entanto, ele tem muito mais recursos para desktop do que o virtualizador nativo, por exemplo, o SEAMLESS que permite puxar um aplicativo Windows dentro da VM para fora, isto é, o sistema hospedeiro, causando a impressão que estamos rodando uma aplicação Linux nativa.  
+No entanto, ele enfrenta alguns bugs chatos desde que os ambientes Linux estão migrando do Xorg para o Wayland. Alguns são problemas grandes, o SEAMLESS não funciona mais, e outros são problemas pequenos aleatórios e irritantes como o conteúdo da área de clipboard entre hospedeiro e convidado deixar de funcionar, cursor do mouse que deixa de funcionar e coisas do tipo, e ainda estou enumerando-os. Espero que as próximas versões corrijam isso, é um bom virtualizador e tem uma opção que qemu+kvm não tem: transportar a VM para outros sistemas operacionais, isto é, você pode copiar a VM criado no Linux para rodar num hospedeiro Windows ou Mac OS.  
 
 Para instalar é fácil, similar ao Google Chrome, você precisa acessar a página de Downloads que começa no link abaixo:  
 (https://www.virtualbox.org/)
@@ -1973,12 +1997,12 @@ O "VirtualBox Extension Pack" é gratuito para uso pessoal e educacional, mas te
 
 Uma vez que tanto o **VirtualBox** como também o **Extension Pack** estão instalados, agora vamos fazer alguns ajustes.  
 
->**IMPORTANTE**: O principal concorrente do VirtualBox é o **VMWare WorkStation** que recentemente também tornou-se gratuito para alguns fins, se você considera instalá-lo, preciso te alertar, também sofre de alguns bugs nesta transição de Xorg para Wayland. Além disso, é fácil de instalar e complicado de manter já que a cada atualização de kernel, seus módulos precisam ser recompilados e nem sempre funcionam na versão recente. Em distros como 'Debian' que tem pouca atualização de kernel - apenas patches - é até um mundo tranquilo para usá-lo, mas em distros _blending-edge_ como o Fedora, é um inferno.  
+>**IMPORTANTE**: O principal concorrente do VirtualBox é o **VMWare WorkStation** que recentemente também tornou-se gratuito para alguns fins, se você considera instalá-lo, preciso te alertar, também sofre de alguns bugs nesta transição de Xorg para Wayland. Além disso, é fácil de instalar e complicado de manter já que a cada atualização de kernel, seus módulos precisam ser recompilados e nem sempre funcionam na versão recente. Em distros como 'Debian' ou 'Ubuntu LTS' que tem pouca atualização de kernel - apenas patches - é até um mundo tranquilo para usá-lo, mas em distros _blending-edge_ como o Fedora u Ubuntu não-LTS, é um inferno.  
 
 
 
 ### VIRTUALBOX - ACESSO AO GRUPO 'VBOXUSERS'
-Você precisa adicionar o usuário ao grupo ‘vboxusers’ para que ele tenha permissão de acessar dispositivos USB, configurar redes em modo bridge e usar outros recursos específicos do VirtualBox. Sem isso, o VirtualBox não consegue gerenciar esses recursos de forma segura e controlada. Assim precisaremos executar:  
+Você precisa adicionar o usuário ao grupo **vboxusers** para que ele tenha permissão de acessar dispositivos USB, configurar redes em modo bridge e usar outros recursos específicos do VirtualBox. Sem isso, o VirtualBox não consegue gerenciar esses recursos de forma segura e controlada. Assim precisaremos executar:  
 ```
 sudo usermod -a -G vboxusers $USER
 ```
